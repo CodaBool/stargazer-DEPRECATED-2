@@ -12,8 +12,9 @@ export default async function Page({ searchParams }) {
       backgroundSize: '20px 20px',
       height: '100vh',
       display: 'flex',
-      justifyContent: 'center',
+      justifyContent: 'start',
       alignItems: 'center',
+      paddingTop: "18vh",
       flexDirection: "column"
     }}>
       <Link href={redirectUrl} className="mb-4">

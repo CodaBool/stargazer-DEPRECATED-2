@@ -481,6 +481,34 @@ export default function Map({ width, height, data, name, mobile, params, locked 
           message: "icons loaded",
         }, '*')
 
+        // if zoomed or boxed
+        const bounds = map.getBounds()
+
+        // OR if you're storing custom box corners:
+        const sw = [bounds.getWest(), bounds.getSouth()]
+        const ne = [bounds.getEast(), bounds.getNorth()]
+
+        // Convert them into Turf.js points
+        const tl = turf.point([sw[0], ne[1]])
+        const tr = turf.point([ne[0], ne[1]])
+        const br = turf.point([ne[0], sw[1]])
+        const bl = turf.point([sw[0], sw[1]])
+
+        // Calculate distances in miles
+        const distances = {
+          top: turf.distance(tl, tr, { units: 'miles' }),
+          right: turf.distance(tr, br, { units: 'miles' }),
+          bottom: turf.distance(br, bl, { units: 'miles' }),
+          left: turf.distance(bl, tl, { units: 'miles' }),
+          units: "miles",
+        }
+
+        console.log(distances)
+        window.parent.postMessage({
+          type: 'log',
+          message: distances,
+        }, '*')
+
         domToPng(document.querySelector('#map'), { scale: 2 }).then((d3PNG) => {
           const img1 = new Image();
           const img2 = new Image();
@@ -511,6 +539,7 @@ export default function Map({ width, height, data, name, mobile, params, locked 
               window.parent.postMessage({
                 type: 'webpImage',
                 webpImage,
+                distances,
               }, '*')
             };
           };
