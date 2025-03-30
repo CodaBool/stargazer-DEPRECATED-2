@@ -424,7 +424,7 @@ export default function Map({ width, height, data, name, mobile, params, locked 
         userMadeLocations.forEach(location => {
           if (!location.properties.icon) {
             const type = location.properties.type;
-            location.properties.icon = `https://raw.githubusercontent.com/CodaBool/starlaser/refs/heads/main/public/svg/lancer/${type}.svg`;
+            location.properties.icon = `https://raw.githubusercontent.com/CodaBool/starlaser/refs/heads/main/public/svg/default/${type}.svg`;
           }
         })
 
