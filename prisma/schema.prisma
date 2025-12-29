@@ -1,12 +1,14 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output = "./generated"
 }
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DIRECT_URL")
-  directUrl = env("DIRECT_URL")
 }
+
+// most values are gotten from the auth docs
+// https://authjs.dev/getting-started/adapters/prisma
 
 model Comment {
   id         Int      @id @default(autoincrement())
@@ -29,16 +31,15 @@ model Location {
   type        String    @db.VarChar(25)
   geometry    String    @db.VarChar(25)
   coordinates String    @db.VarChar(100)
-  faction     String    @db.VarChar(50)
+  faction     String    @db.VarChar(400)
   source      String    @db.VarChar(100)
   userId      String
   published   Boolean   @default(false)
   capital     Boolean   @default(false)
-  label       Boolean   @default(false)
   destroyed   Boolean   @default(false)
   resolved    Boolean   @default(false)
   unofficial  Boolean   @default(false)
-  alias       String?   @db.VarChar(50)
+  alias       String?   @db.VarChar(150)
   map         String
   comments    Comment[]
   user        User      @relation(fields: [userId], references: [id])
@@ -51,7 +52,7 @@ model Map {
   lastUsed    DateTime @default(now()) @db.Timestamp(6)
   updatedAt   DateTime @updatedAt
   userId      String
-  hash        String
+  // hash        String
   published   Boolean  @default(false)
   locations   Int      @default(0)
   territories Int      @default(0)
@@ -68,10 +69,44 @@ model User {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   emailVerified DateTime?
-  alias         String?    @unique @db.VarChar(16)
+  image         String?
+  name          String?    @db.VarChar(16)
   comments      Comment[]
   locations     Location[]
   maps          Map[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model VerificationToken {
